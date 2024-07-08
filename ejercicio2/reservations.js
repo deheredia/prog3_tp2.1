@@ -1,6 +1,33 @@
-class Customer {}
+class Customer {
+    constructor(id, name, email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 
-class Reservation {}
+    get info() {
+        return `${this.name} (${this.email})`;
+    }
+}
+
+class Reservation {
+    constructor(id, customer, date, guests) {
+        this.id = id;
+        this.customer = customer;
+        this.date = new Date(date);
+        this.guests = guests;
+    }
+
+    get info() {
+        return `Fecha: ${this.date.toLocaleString()}, Cliente: ${this.customer.info}, Comensales: ${this.guests}`;
+    }
+
+    static validateReservation(date, guests) {
+        const reservationDate = new Date(date);
+        const now = new Date();
+        return reservationDate > now && guests > 0;
+    }
+}
 
 class Restaurant {
     constructor(name) {
@@ -20,9 +47,7 @@ class Restaurant {
             reservationCard.className = "box";
             reservationCard.innerHTML = `
                     <p class="subtitle has-text-primary">
-                        Reserva ${
-                            reservation.id
-                        } - ${reservation.date.toLocaleString()}
+                        Reserva ${reservation.id} - ${reservation.date.toLocaleString()}
                     </p>
                     <div class="card-content">
                         <div class="content">
@@ -37,40 +62,27 @@ class Restaurant {
     }
 }
 
-document
-    .getElementById("reservation-form")
-    .addEventListener("submit", function (event) {
-        event.preventDefault();
+document.getElementById("reservation-form").addEventListener("submit", function (event) {
+    event.preventDefault();
 
-        const customerName = document.getElementById("customer-name").value;
-        const customerEmail = document.getElementById("customer-email").value;
-        const reservationDate =
-            document.getElementById("reservation-date").value;
-        const guests = parseInt(document.getElementById("guests").value);
+    const customerName = document.getElementById("customer-name").value;
+    const customerEmail = document.getElementById("customer-email").value;
+    const reservationDate = document.getElementById("reservation-date").value;
+    const guests = parseInt(document.getElementById("guests").value);
 
-        if (Reservation.validateReservation(reservationDate, guests)) {
-            const customerId = restaurant.reservations.length + 1;
-            const reservationId = restaurant.reservations.length + 1;
+    if (Reservation.validateReservation(reservationDate, guests)) {
+        const customerId = restaurant.reservations.length + 1;
+        const reservationId = restaurant.reservations.length + 1;
 
-            const customer = new Customer(
-                customerId,
-                customerName,
-                customerEmail
-            );
-            const reservation = new Reservation(
-                reservationId,
-                customer,
-                reservationDate,
-                guests
-            );
+        const customer = new Customer(customerId, customerName, customerEmail);
+        const reservation = new Reservation(reservationId, customer, reservationDate, guests);
 
-            restaurant.addReservation(reservation);
-            restaurant.render();
-        } else {
-            alert("Datos de reserva inválidos");
-            return;
-        }
-    });
+        restaurant.addReservation(reservation);
+        restaurant.render();
+    } else {
+        alert("Datos de reserva inválidos");
+    }
+});
 
 const restaurant = new Restaurant("El Lojal Kolinar");
 
